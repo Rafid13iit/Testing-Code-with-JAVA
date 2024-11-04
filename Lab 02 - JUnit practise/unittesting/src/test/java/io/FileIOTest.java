@@ -1,52 +1,48 @@
 package io;
 
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class FileIOTest {
+public class FileIOTest {
 
-    private FileIO fileIO;
-    private Path validFilePath;
-    private Path emptyFilePath;
-    private Path invalidFilePath;
-
-    @BeforeEach
-    void setUp() throws IOException {
-        fileIO = new FileIO();
-        validFilePath = Paths.get("test_valid.txt");
-        emptyFilePath = Paths.get("test_empty.txt");
-        invalidFilePath = Paths.get("test_invalid.txt");
-
-        // Create test files
-        Files.writeString(validFilePath, "1\n2\n3\n");
-        Files.createFile(emptyFilePath);
-        Files.writeString(invalidFilePath, "1\nabc\n5\n");
+    @Test
+    public void testReadFileFileDoesNotExist() {
+        FileIO fileIO = new FileIO();
+        String filepath = "src/test/resources/nonexistent_file.txt";
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> fileIO.readFile(filepath)
+        );
+        assertEquals("Input file does not exist", exception.getMessage());
     }
 
     @Test
-    void testReadFile_ValidFile() {
-        int[] expected = {1, 2, 3};
-        assertArrayEquals(expected, fileIO.readFile(validFilePath.toString()));
+    public void testReadFileEmptyFile() {
+        FileIO fileIO = new FileIO();
+        String filepath = "src/test/resources/empty_file.txt";
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> fileIO.readFile(filepath)
+        );
+        assertEquals("Given file is empty", exception.getMessage());
     }
 
     @Test
-    void testReadFile_EmptyFile_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> fileIO.readFile(emptyFilePath.toString()));
+    public void testReadFileValidInput() {
+        FileIO fileIO = new FileIO();
+        String filepath = "src/test/resources/grades_valid.txt";
+        int[] actualResult = fileIO.readFile(filepath);
+        int[] expectedResult = {3, 9, 0, 2, 10, 9, 3, 8, 0, 3};
+        assertArrayEquals(expectedResult, actualResult);
     }
 
     @Test
-    void testReadFile_InvalidFile_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> fileIO.readFile("nonexistent.txt"));
-    }
-
-    @Test
-    void testReadFile_FileWithInvalidEntries() {
-        int[] expected = {1, 5};
-        assertArrayEquals(expected, fileIO.readFile(invalidFilePath.toString()));
+    public void testReadFileInvalidInput() {
+        FileIO fileIO = new FileIO();
+        String filepath = "src/test/resources/grades_invalid.txt";
+        int[] actualResult = fileIO.readFile(filepath);
+        int[] expectedResult = {3, 9, 2, 10, 8, 0, 3};
+        assertArrayEquals(expectedResult, actualResult);
     }
 }

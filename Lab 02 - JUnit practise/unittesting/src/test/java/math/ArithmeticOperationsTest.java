@@ -9,37 +9,60 @@ public class ArithmeticOperationsTest {
     private ArithmeticOperations arithmeticOperations;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         arithmeticOperations = new ArithmeticOperations();
     }
 
+    // Tests for divide method
+
     @Test
-    void testDivide_Success() {
-        assertEquals(5.0, arithmeticOperations.divide(10, 2));
+    public void testDivideNormalValues() {
+        double result = arithmeticOperations.divide(10, 2);
+        assertEquals(5.0, result, 0.001, "10 / 2 should be 5");
     }
 
     @Test
-    void testDivide_ThrowsArithmeticException() {
-        assertThrows(ArithmeticException.class, () -> arithmeticOperations.divide(10, 0));
+    public void testDivideWithZeroNumerator() {
+        double result = arithmeticOperations.divide(0, 5);
+        assertEquals(0.0, result, "0 / 5 should be 0");
     }
 
     @Test
-    void testMultiply_Success() {
-        assertEquals(20, arithmeticOperations.multiply(4, 5));
+    public void testDivideWithZeroDenominator() {
+        Exception exception = assertThrows(ArithmeticException.class, () -> {
+            arithmeticOperations.divide(10, 0);
+        });
+        assertEquals("Cannot divide with zero", exception.getMessage());
+    }
+
+    // Tests for multiply method
+
+
+    @Test
+    public void testMultiplyNormalValues() {
+        int result = arithmeticOperations.multiply(3, 4);
+        assertEquals(12, result, "3 * 4 should be 12");
     }
 
     @Test
-    void testMultiply_ZeroMultiplication() {
-        assertEquals(0, arithmeticOperations.multiply(5, 0));
+    public void testMultiplyWithZero() {
+        int result = arithmeticOperations.multiply(5, 0);
+        assertEquals(0, result, "5 * 0 should be 0");
     }
 
     @Test
-    void testMultiply_ThrowsIllegalArgumentException_NegativeInput() {
-        assertThrows(IllegalArgumentException.class, () -> arithmeticOperations.multiply(-1, 5));
+    public void testMultiplyWithNegativeInput() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            arithmeticOperations.multiply(-1, 5);
+        });
+        assertEquals("x & y should be >= 0", exception.getMessage());
     }
 
     @Test
-    void testMultiply_ThrowsIllegalArgumentException_Overflow() {
-        assertThrows(IllegalArgumentException.class, () -> arithmeticOperations.multiply(Integer.MAX_VALUE, 2));
+    public void testMultiplyOverflow() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            arithmeticOperations.multiply(Integer.MAX_VALUE, 2);
+        });
+        assertEquals("The product does not fit in an Integer variable", exception.getMessage());
     }
 }
